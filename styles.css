@@ -1,16 +1,311 @@
-body {
-  margin: 0;
-  padding: 2rem;
-  font-family: system-ui, sans-serif;
-  line-height: 1.6;
-  color: #1a1a1a;
+:root {
+  --paper-high: #f8f5ec;
+  --paper: #f1ece0;
+  --paper-deep: #e2dacb;
+  --ink: #2b2f31;
+  --ink-soft: #737a7d;
+  --bronze-deep: #3b433d;
+  --bronze-dark: #4b544c;
+  --bronze: #707c6d;
+  --bronze-high: #9aa392;
+  --wood-high: #a37f5d;
+  --wood: #87684b;
+  --wood-dark: #5b4432;
+  --glow: #e0c27a;
 }
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  /* The gestures belong to the instrument, not to the browser: without these
+     a drag scrolls the page on a phone and a pinch zooms the document. */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Songti SC", "Noto Serif SC", "Source Han Serif SC", "STSong", Georgia, serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- masthead ---------- */
+
+.masthead {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 1.15rem 1rem 0;
+  pointer-events: none;
+}
+
+.seal {
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  color: #8d3b2f;
+}
+
+.seal__char {
+  display: inline-block;
+  padding: 0.14em 0.2em 0.2em;
+  border: 1.5px solid currentcolor;
+  border-radius: 2px;
+  opacity: 0.82;
+}
+
+.hint {
+  margin: 0.55rem 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.09em;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.hint__en {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.72rem;
+  font-style: italic;
+  letter-spacing: 0.03em;
+  opacity: 0.72;
+}
+
+.masthead__nav {
+  position: fixed;
+  bottom: 0.7rem;
+  left: 0.9rem;
+  pointer-events: auto;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  opacity: 0.3;
+}
+
+.masthead__nav a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.masthead__nav a:hover,
+.masthead__nav a:focus-visible {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* ---------- the scene ---------- */
 
 main {
-  max-width: 40rem;
-  margin: 0 auto;
+  height: 100%;
 }
 
-a {
-  color: #0b5fff;
+.scene {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  user-select: none;
+  cursor: default;
+}
+
+.scene__grain {
+  opacity: 0.045;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.scene__hills path {
+  fill: var(--ink);
+  opacity: 0.075;
+}
+
+.scene__mist {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.2;
+  opacity: 0.13;
+}
+
+.frame rect {
+  fill: var(--wood-dark);
+  opacity: 0.9;
+}
+
+.frame__post {
+  opacity: 0.55;
+}
+
+/* ---------- the bell ---------- */
+
+.halo {
+  opacity: 0;
+  transition: opacity 420ms ease-out;
+  pointer-events: none;
+}
+
+.halo[data-lit="hover"] {
+  opacity: 0.5;
+}
+
+.bell {
+  cursor: ns-resize;
+}
+
+.bell__body {
+  fill: url(#bronze);
+  stroke: var(--bronze-deep);
+  stroke-width: 1.1;
+}
+
+.bell__knob {
+  fill: var(--bronze-dark);
+}
+
+.bell__knob-loop {
+  fill: none;
+  stroke: var(--bronze-dark);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.bell__band,
+.bell__lip {
+  fill: none;
+  stroke: var(--bronze-deep);
+  stroke-linecap: round;
+  opacity: 0.5;
+}
+
+.bell__band {
+  stroke-width: 1.6;
+}
+
+.bell__lip {
+  stroke-width: 4;
+  opacity: 0.72;
+}
+
+.bell__studs circle {
+  fill: var(--bronze-deep);
+  opacity: 0.4;
+}
+
+.bell__art {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* the flash at the moment of contact */
+.bell[data-ringing="true"] .bell__body {
+  fill: var(--bronze-high);
+}
+
+/* ---------- ripples ---------- */
+
+.ripples circle {
+  fill: none;
+  stroke: var(--glow);
+  stroke-width: 2.5;
+  pointer-events: none;
+}
+
+/* ---------- the beam ---------- */
+
+.rope {
+  stroke: var(--wood-dark);
+  stroke-width: 2;
+  opacity: 0.6;
+}
+
+.pivot {
+  fill: var(--wood-dark);
+}
+
+.beam {
+  cursor: grab;
+}
+
+.beam[data-held="true"] {
+  cursor: grabbing;
+}
+
+.beam__grab {
+  fill: transparent;
+}
+
+.beam__log {
+  fill: url(#wood);
+  stroke: var(--wood-dark);
+  stroke-width: 1;
+}
+
+.beam__head {
+  fill: var(--wood-high);
+  stroke: var(--wood-dark);
+  stroke-width: 1.2;
+}
+
+.beam__grain {
+  fill: none;
+  stroke: var(--wood-dark);
+  stroke-width: 1;
+  opacity: 0.3;
+  stroke-dasharray: 22 13 34 9;
+}
+
+/* A held beam glows faintly warmer the higher it is raised, so you can feel
+   how hard the next strike will land before you let go. */
+.rig__swing {
+  filter: drop-shadow(0 0 0 transparent);
+}
+
+/* ---------- phones ---------- */
+
+@media (max-width: 640px) {
+  .seal {
+    font-size: 1.5rem;
+  }
+
+  .hint {
+    font-size: 0.72rem;
+    max-width: 22rem;
+  }
+
+  .hint__en {
+    font-size: 0.64rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .halo {
+    transition: none;
+  }
 }

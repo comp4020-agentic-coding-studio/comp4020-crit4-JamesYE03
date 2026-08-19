@@ -1,19 +1,14 @@
 <!doctype html>
-<html lang="en-AU">
+<html lang="zh-Hans">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>COMP4020 prototype</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>鐘 Temple Bell — 撞钟</title>
     <meta
       name="description"
-      content="Replace this with one sentence saying what this page is. A search result and a link preview both show it."
+      content="Drag the hanging beam and let gravity swing it into a bronze temple bell. Scroll or pinch to resize the bell: a bigger bell rings lower and darker. Every sound is synthesised live in the browser."
     />
 
-    <!--
-      The link-preview card: public/card.png, 1200x630 --- replace it. The URL
-      resolves against this page, like any link. No og:title/og:description:
-      scrapers fall back to the <title> and description above.
-    -->
     <meta property="og:type" content="website" />
     <meta property="og:image" content="./card.png" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -21,18 +16,142 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <header>
-      <nav aria-label="Primary">
-        <a href="./">Home</a>
+    <header class="masthead">
+      <h1 class="seal">
+        <span class="seal__char" aria-hidden="true">鐘</span>
+        <span class="sr-only">鐘 — a bronze temple bell you strike in the browser</span>
+      </h1>
+      <p class="hint">
+        <span>拖动撞木，松手撞钟 · 滚轮或双指缩放大钟</span>
+        <span class="hint__en" lang="en">drag the beam and let go · scroll or pinch to resize the bell</span>
+      </p>
+      <nav aria-label="Primary" class="masthead__nav">
+        <a href="./">鐘 Temple Bell</a>
       </nav>
     </header>
+
     <main>
-      <h1>COMP4020 prototype</h1>
-      <p data-testid="intro">
-        Replace this with your prototype. This week's brief is on the course website;
-        <code>spec/README.md</code> explains how the checks in this repo relate to it.
-      </p>
+      <svg
+        class="scene"
+        data-scene
+        viewBox="0 0 900 640"
+        preserveAspectRatio="xMidYMid meet"
+        role="application"
+        aria-label="A bronze temple bell with a wooden beam hanging beside it. Drag the beam away from the bell and release it to strike."
+      >
+        <defs>
+          <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--paper-high)" />
+            <stop offset="62%" stop-color="var(--paper)" />
+            <stop offset="100%" stop-color="var(--paper-deep)" />
+          </linearGradient>
+
+          <linearGradient id="bronze" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="var(--bronze-dark)" />
+            <stop offset="18%" stop-color="var(--bronze)" />
+            <stop offset="42%" stop-color="var(--bronze-high)" />
+            <stop offset="66%" stop-color="var(--bronze)" />
+            <stop offset="100%" stop-color="var(--bronze-deep)" />
+          </linearGradient>
+
+          <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--wood-high)" />
+            <stop offset="55%" stop-color="var(--wood)" />
+            <stop offset="100%" stop-color="var(--wood-dark)" />
+          </linearGradient>
+
+          <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%" stop-color="var(--glow)" stop-opacity="0.5" />
+            <stop offset="70%" stop-color="var(--glow)" stop-opacity="0.12" />
+            <stop offset="100%" stop-color="var(--glow)" stop-opacity="0" />
+          </radialGradient>
+
+          <filter id="ink-bleed" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="7" />
+          </filter>
+
+          <filter id="grain" x="0" y="0" width="100%" height="100%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="7" />
+            <feColorMatrix type="saturate" values="0" />
+          </filter>
+        </defs>
+
+        <!-- paper -->
+        <rect width="900" height="640" fill="url(#paper)" />
+        <rect width="900" height="640" filter="url(#grain)" class="scene__grain" />
+
+        <!-- 远山: one soft ink silhouette, and nothing else -->
+        <g class="scene__hills" filter="url(#ink-bleed)" aria-hidden="true">
+          <path d="M -40 470 C 130 396 210 452 330 424 C 470 392 560 448 700 410 C 810 380 890 418 940 400 L 940 640 L -40 640 Z" />
+        </g>
+        <path
+          class="scene__mist"
+          d="M -40 486 C 180 460 330 500 520 478 C 700 458 830 492 940 470"
+          aria-hidden="true"
+        />
+
+        <!-- 梁: the frame both the bell and the beam hang from -->
+        <g class="frame" aria-hidden="true">
+          <rect x="96" y="66" width="672" height="20" rx="5" />
+          <rect x="118" y="86" width="16" height="554" class="frame__post" />
+          <rect x="730" y="86" width="16" height="554" class="frame__post" />
+        </g>
+
+        <!-- glow behind the bell, brightened on hover and on strike -->
+        <circle data-halo class="halo" cx="300" cy="215" r="215" fill="url(#halo)" />
+
+        <!-- 鐘 -->
+        <g data-bell class="bell" aria-label="The bell. Scroll or pinch to resize it: a bigger bell rings lower.">
+          <g class="bell__art">
+            <!-- 龍鈕 -->
+            <path class="bell__knob" d="M -13 -6 C -15 -26 -6 -34 0 -34 C 6 -34 15 -26 13 -6 Z" />
+            <path class="bell__knob-loop" d="M -7 -26 C -7 -36 7 -36 7 -26" />
+            <!-- 鐘身 -->
+            <path
+              class="bell__body"
+              d="M 0 -6 C -24 -6 -42 6 -48 28 C -60 66 -70 122 -74 174 C -76 186 -74 194 -66 197 L 66 197 C 74 194 76 186 74 174 C 70 122 60 66 48 28 C 42 6 24 -6 0 -6 Z"
+            />
+            <!-- 帶: the cast bands -->
+            <path class="bell__band" d="M -52 46 C -20 52 20 52 52 46" />
+            <path class="bell__band" d="M -63 104 C -24 111 24 111 63 104" />
+            <path class="bell__band" d="M -71 158 C -27 165 27 165 71 158" />
+            <!-- 鐘口 -->
+            <path class="bell__lip" d="M -66 194 C -24 200 24 200 66 194" />
+            <!-- 乳釘 -->
+            <g class="bell__studs">
+              <circle cx="-34" cy="76" r="3" />
+              <circle cx="0" cy="79" r="3" />
+              <circle cx="34" cy="76" r="3" />
+            </g>
+          </g>
+        </g>
+
+        <!-- ripples land here, in scene coordinates -->
+        <g data-ripples class="ripples" aria-hidden="true"></g>
+
+        <!-- 撞木 -->
+        <g data-rig class="rig">
+          <g data-swing class="rig__swing">
+            <line data-rope class="rope" x1="446" y1="90" x2="378" y2="248" />
+            <line data-rope class="rope" x1="446" y1="90" x2="514" y2="248" />
+            <g
+              data-beam
+              class="beam"
+              tabindex="-1"
+              aria-label="The beam. Drag it away from the bell and let go to strike."
+            >
+              <!-- generous, invisible grab area -->
+              <rect class="beam__grab" x="356" y="222" width="180" height="76" />
+              <rect class="beam__log" x="371" y="247" width="150" height="26" rx="13" />
+              <circle class="beam__head" cx="374" cy="260" r="17" />
+              <path class="beam__grain" d="M 392 260 H 512" />
+            </g>
+          </g>
+          <circle data-pivot class="pivot" cx="446" cy="90" r="7" aria-hidden="true" />
+        </g>
+      </svg>
     </main>
+
     <script type="module" src="./main.ts"></script>
   </body>
 </html>
