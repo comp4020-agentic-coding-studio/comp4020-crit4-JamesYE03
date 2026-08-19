@@ -1,46 +1,35 @@
-<!-- DRAFT from this week's session record. Everything factual here happened and is
-     checkable against the commits; the judgements are in my voice as a starting
-     point. Read every sentence and make it mine, or replace it. ~270 words, per the
-     course's stated range. Delete this comment before the cutoff. -->
-
 # C4 — An instrument
 
 ## What was the breakthrough that moved the work forward?
 
-Describing the mechanism instead of the effect.
+I had to hold the picture in my head first.
 
-I didn't ask for a beam that "feels weighty." I said: it hangs horizontally from a
-pivot above, tied at both ends by two ropes; drag it left and it rides a circular
-arc about that pivot; let go and gravity brings it back down; the higher you raised
-it, the louder it lands. Directly implementable — it became a pendulum equation in
-about twenty lines.
+Before I could tell the agent anything useful, I needed to see the beam falling. Not
+"make it feel heavy". I needed to know that the beam hangs from a pivot on two ropes,
+that you pull it left along a circle, and that gravity brings it back down into the
+bell. Once I could see it, I could describe it, and the agent turned the description
+into a pendulum in about twenty lines.
 
-What I didn't expect is that the same description let me *catch* the bug. The first
-build had the bell on the wrong side. At rest the head was touching it, it sounded
-fine, thirty-seven tests were green. I saw it only because I had a physical model
-in my head and could ask which way the head was moving when it landed — away from
-the bell, so it could never have struck it.
+The same picture let me fix the layout. The agent had put the bell on the left of the
+beam, with the beam still pulled left. It looked fine: at rest the head was touching
+the bell, the sound was fine, thirty-seven tests were green. But the beam comes back
+down moving to the right, so the head was moving *away* from the bell when it landed.
+It could never have hit anything.
 
-A description precise enough to build from is precise enough to audit.
+I saw that straight away. It was common sense, not analysis. Nothing in the code said
+so. I knew it because I know how a real bell and a real hammer work.
 
 ## What did this work change about who I want to be as a software developer?
 
-I stopped reading green as correct.
+The agent writes very good code. It is faster than me and it knows things I do not. I
+did not know that a bell's partials are inharmonic, and I had never used Web Audio. It
+handled both.
 
-The mirrored geometry passed thirty-seven tests. The muddy bell passed forty-one.
-And the check I added so the geometry bug could never recur was itself vacuous — it
-compared the bell's position against itself, and stayed green with the bug put
-straight back in. A test that cannot fail is worse than none: it reports confidence
-it never earned.
+But it got a simple physical fact wrong and did not notice. An agent can be excellent
+at code and still fail to understand something obvious about the physical world.
 
-So the habit I want is procedural, not attitudinal. Break it on purpose, watch it
-go red, put it back. Thirty seconds, and it is the only reason I believe those
-assertions now.
+So this is where I am useful. Not in typing code. In knowing how real things behave,
+and checking the code against that. The agent can hold the whole Web Audio API in its
+head. It could not tell that the hammer was swinging the wrong way.
 
-The other half matters as much. The bell got clearer because I listened and said
-so, not because anything went red. Naming which parts of a spec my sensors cannot
-reach is engineering, not an admission I ran out of time to automate.
-
-<!-- One job left for you: a concrete sentence on what the additive version actually
-     sounded like next to the muddy one. That is the evidence for the paragraph
-     above, and only your ears can supply it. -->
+I want to be the person who catches that.
