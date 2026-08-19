@@ -1,85 +1,80 @@
 # Process overview
 
-<!-- TEMPLATE: this file is a shape to fill in, not a form. Replace everything
-     in it with your own overview, and delete this comment — `pnpm
-     check:evidence` will remind you if it's still here. -->
-
-A reading-guide to how the work came together --- a map to your process, not an
-essay about it. Markers read this file and follow its citations; they don't
-trawl the repo for evidence you didn't point at, so if a moment mattered, cite
-it.
-
-This file is the shape; the course site's
-[assessment page](https://comp.anu.edu.au/courses/comp4020-agentic-coding-studio/topics/assessment/#what-you-submit)
-is the requirement, and its
-[word counts](https://comp.anu.edu.au/courses/comp4020-agentic-coding-studio/topics/assessment/#word-counts)
-cover every deliverable.
-
 ## What I built
 
-One paragraph: the thing, and the idea behind it.
+**鐘 Temple Bell** — a bronze temple bell you strike in the browser. A wooden
+beam hangs by two ropes from a single pivot beside the bell; drag it up its arc
+and let go, and gravity swings it back down through rest into the bell. How high
+you raised it sets how hard it lands, which sets both loudness and how long the
+bell rings. The mouse wheel or a two-finger pinch resizes the bell, and a bigger
+bell is lower *and* darker — size changes the spectrum, not just the pitch.
+Every sound is synthesised at strike time with Web Audio; nothing audible ships
+as a file, and a spec test enforces that.
 
 ## The moments that mattered
 
-Three or four for an assignment; fewer is fine for a weekly prototype. Keep the
-list short so each moment has room to do all four jobs:
+### 1. The harness front-loaded the decisions, and pruned itself on the way in
 
-1. **what happened** --- the problem, or the thing that went wrong
-2. **what you did instead of the obvious thing** --- the call you made, and why
-   it beat the obvious one
-3. **how you knew it was right** --- the check you ran, the viewport you looked
-   at, what you read before accepting the diff
-4. **the citation** --- a commit or commit range, a `CLAUDE.md` change, a check
-   that went from red to green, a prompt paired with the commit it produced
+A1 ended with a rule in `CLAUDE.md` saying every new week opens with a batch of
+5–15 questions before a line of code — because earlier weeks had trickled
+decisions out over many small exchanges. Carrying that forward this week
+produced twelve questions answered in one message: the instrument concept, the
+beam's physics, the timbre, the scope, the visual direction. Code started after
+that, not before.
 
-Jobs 2 and 3 are the ones the repo can't tell a reader on its own, so they're
-where the marks are. The strongest moments are the ones where a correction
-landed in the **harness** --- the standards and checks your work has to satisfy
---- rather than in a retry: a rule added to `CLAUDE.md`, a check wired up, an
-attempt thrown away. Retrying until it passes is the routine case, and changing
-what the work runs against is the skilled one.
+Carrying the harness forward also meant deciding what to *drop*. A1's file
+carried a long `linkinator` recipe that only makes sense with Astro's explicit
+`base`, and a lint sensor that A1's `check` ran and this template's does not.
+Both were now actively wrong. I kept the principle underneath the first one — the
+deployed site lives at a subpath, so test routes against a server that mounts it
+there — and replaced the Astro-specific commands with this week's Vite reality,
+and noted plainly that there is no lint step here so nothing cites one.
 
-Cite each moment as a link whose text is the commit hash or range and whose
-target is this repo's commit or compare URL, so a reader clicks straight to the
-evidence:
+[`e75a74d`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit4-JamesYE03/commit/e75a74d)
 
-- one commit: [`a1b2c3d`](https://github.com/YOUR-ORG/YOUR-REPO/commit/a1b2c3d)
-- a range:
-  [`a1b2c3d...e4f5a6b`](https://github.com/YOUR-ORG/YOUR-REPO/compare/a1b2c3d...e4f5a6b)
+### 2. The spec became tests before the instrument existed
 
-To pair a prompt with the commit it produced, quote the prompt (curated, not a
-full transcript) next to the citation:
+Nine of C4's spec lines are mechanically checkable, so they went in as contract
+tests first, red, with no prototype behind them. The interesting part was where
+to put the assertions: the physics and the synthesis maths went into
+`src/pendulum.ts` and `src/bell.ts` as pure functions over numbers — no DOM, no
+`AudioContext` — so the tests could assert *what the instrument must do* ("a
+bigger bell is lower across the whole range", "one release, one strike, no
+rebound", "a harder strike rings longer") rather than how it was wired. Fifteen
+of them passed the moment those two modules were written, which caught the maths
+before any of it was audible; the rest stayed red until there was a page.
 
-> the prompt, verbatim
+Red-to-green:
+[`99af7e4...5241d25`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit4-JamesYE03/compare/99af7e4...5241d25)
 
-Screenshots are welcome where one carries the verification better than a
-sentence does. Commit the file to this repo and link it with a **relative**
-path, which is what makes it render on GitHub: `![alt text](docs/before.png)`.
-Images don't count towards the word count and don't replace the citation.
+### 3. I asked for the wrong algorithm and the correction went into the harness
 
-### A worked moment, for shape
+I specified Karplus-Strong for the bell. The pushback was that K-S is a
+plucked-string algorithm: its delay line produces a *harmonic* comb, partials at
+integer multiples of one fundamental, and a bell's character is precisely its
+**inharmonicity** — the hum a fifth below, the minor-third tierce, the quint,
+the nominal, each decaying at its own rate. That is the whole difference between
+"bell" and "string". I took the correction and the synthesis became additive over
+those named partials instead.
 
-Delete this section along with the rest of the boilerplate --- it's here to show
-the four jobs in one paragraph, not to be imitated in content.
+What matters is where the correction landed. Not in a retry: it went into
+`CLAUDE.md` as a stated fact about the stack, *and* into the spec suite as a test
+that asserts at least three partials are non-integer multiples of the prime. A
+future change that quietly harmonises the spectrum now fails a check instead of
+just sounding wrong.
 
-> The date formatter kept coming back with `toLocaleDateString()` and no locale
-> argument, so the same build rendered differently on my machine and in CI. I'd
-> already re-prompted it twice, which fixed the line but not the habit, so the
-> third time I put the rule in `CLAUDE.md` instead
-> ([`3f9ac21`](https://github.com/YOUR-ORG/YOUR-REPO/commit/3f9ac21)) and added
-> a spec test that fails on a bare `toLocaleDateString`. That's what told me it
-> had actually taken: the test went red against the old code and green against
-> the new, and the next two features it wrote passed it without prompting
-> ([`3f9ac21...b7e0d14`](https://github.com/YOUR-ORG/YOUR-REPO/compare/3f9ac21...b7e0d14)).
+[`e75a74d`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit4-JamesYE03/commit/e75a74d)
+· [`99af7e4`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit4-JamesYE03/commit/99af7e4)
 
-## Before you ship
+<!-- TODO (James): job 3 for this moment — "how I knew it was right" — is the one
+     thing no test here can carry, because it is my ears. Add a sentence in your
+     own words after you have listened: what the additive version gave you that
+     you would not have got from K-S. That sentence is the evidence. -->
 
-`pnpm check:evidence` verifies your citations resolve to real commits, that a
-reflection entry the marker reads is in `reflections/`, and that your
-`CLAUDE.md` is there --- before a marker ever opens the file. It checks that
-your map is traceable, not that it is good: the marker judges whether your
-small, deliberately chosen set of moments shows real judgement and reflection. A
-green check is not a substitute for that curation.
+## Where the checks stop
 
-Images aren't checked: whether one renders is visible the moment you look. Open
-this file on GitHub and look at it before you ship.
+`pnpm check` (typecheck, build, 37 tests) holds the contracts. It cannot tell me
+whether the bell sounds like a bell, whether the beam feels weighty, or whether a
+stranger finds music in it uninstructed — and those are exactly what the pod
+judges on a cold open. Those spec lines are named in `CLAUDE.md` so I know they
+are mine, not the suite's.
