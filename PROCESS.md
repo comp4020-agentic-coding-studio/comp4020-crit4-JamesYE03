@@ -1,80 +1,50 @@
+<!-- DRAFT from this week's session record. Every claim is checkable against the
+     cited commits; the judgements are in my voice as a starting point. Read it,
+     make it mine, delete this comment. Two moments, ~270 words, per the course's
+     stated range for a crit week. -->
+
 # Process overview
 
 ## What I built
 
-**鐘 Temple Bell** — a bronze temple bell you strike in the browser. A wooden
-beam hangs by two ropes from a single pivot beside the bell; drag it up its arc
-and let go, and gravity swings it back down through rest into the bell. How high
-you raised it sets how hard it lands, which sets both loudness and how long the
-bell rings. The mouse wheel or a two-finger pinch resizes the bell, and a bigger
-bell is lower *and* darker — size changes the spectrum, not just the pitch.
-Every sound is synthesised at strike time with Web Audio; nothing audible ships
-as a file, and a spec test enforces that.
+**鐘 Temple Bell** — a bronze temple bell struck in the browser. A beam hangs from
+a pivot to its left; drag it away, let go, and gravity swings it back in. Release
+height sets loudness and ring length; the wheel or a pinch resizes the bell, and a
+bigger bell is lower *and* darker. Synthesised live over a cast bell's inharmonic
+partials — nothing audible ships as a file.
 
-## The moments that mattered
+## Two moments
 
-### 1. The harness front-loaded the decisions, and pruned itself on the way in
+### A bug thirty-seven green tests could not see
 
-A1 ended with a rule in `CLAUDE.md` saying every new week opens with a batch of
-5–15 questions before a line of code — because earlier weeks had trickled
-decisions out over many small exchanges. Carrying that forward this week
-produced twelve questions answered in one message: the instrument concept, the
-beam's physics, the timbre, the scope, the visual direction. Code started after
-that, not before.
+The bell sat on the same side the beam is pulled towards. At rest the head touches
+it, so it looks right — but the beam returns travelling rightwards, moving *away*
+from the bell at contact. It could never have struck.
 
-Carrying the harness forward also meant deciding what to *drop*. A1's file
-carried a long `linkinator` recipe that only makes sense with Astro's explicit
-`base`, and a lint sensor that A1's `check` ran and this template's does not.
-Both were now actively wrong. I kept the principle underneath the first one — the
-deployed site lives at a subpath, so test routes against a server that mounts it
-there — and replaced the Astro-specific commands with this week's Vite reality,
-and noted plainly that there is no lint step here so nothing cites one.
+Mirroring it is the fix. Instead I moved the geometry into `src/scene.ts` and
+asserted the relationship. My first assertion was worthless: it derived the contact
+point from the bell's own origin and compared it back — true by construction, still
+green with the bug reinstated. Rewriting it from the beam's own pivot, then
+mutation-testing — bell back on the wrong side, three assertions red — is the only
+reason I trust it. That rule is now in `CLAUDE.md`.
 
-[`e75a74d`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit4-JamesYE03/commit/e75a74d)
+[`8dc2ef7`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit4-JamesYE03/commit/8dc2ef7)
 
-### 2. The spec became tests before the instrument existed
+### One correction a check could hold, one it couldn't
 
-Nine of C4's spec lines are mechanically checkable, so they went in as contract
-tests first, red, with no prototype behind them. The interesting part was where
-to put the assertions: the physics and the synthesis maths went into
-`src/pendulum.ts` and `src/bell.ts` as pure functions over numbers — no DOM, no
-`AudioContext` — so the tests could assert *what the instrument must do* ("a
-bigger bell is lower across the whole range", "one release, one strike, no
-rebound", "a harder strike rings longer") rather than how it was wired. Fifteen
-of them passed the moment those two modules were written, which caught the maths
-before any of it was audible; the rest stayed red until there was a page.
+I specified Karplus-Strong — a plucked-string algorithm, harmonic, where a bell's
+character is its inharmonicity. That correction went into the harness, not a retry:
+a fact stated in `CLAUDE.md`, plus a test that at least three partials are
+non-integer multiples of the prime.
 
-Red-to-green:
-[`99af7e4...5241d25`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit4-JamesYE03/compare/99af7e4...5241d25)
+The muddiness it still had, no test could name. Listening found it: the spectrum
+stopped at 4.166× the prime, so nothing above ~625 Hz read as metal, and every
+partial peaked in phase at t=0 and clipped.
 
-### 3. I asked for the wrong algorithm and the correction went into the harness
-
-I specified Karplus-Strong for the bell. The pushback was that K-S is a
-plucked-string algorithm: its delay line produces a *harmonic* comb, partials at
-integer multiples of one fundamental, and a bell's character is precisely its
-**inharmonicity** — the hum a fifth below, the minor-third tierce, the quint,
-the nominal, each decaying at its own rate. That is the whole difference between
-"bell" and "string". I took the correction and the synthesis became additive over
-those named partials instead.
-
-What matters is where the correction landed. Not in a retry: it went into
-`CLAUDE.md` as a stated fact about the stack, *and* into the spec suite as a test
-that asserts at least three partials are non-integer multiples of the prime. A
-future change that quietly harmonises the spectrum now fails a check instead of
-just sounding wrong.
-
-[`e75a74d`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit4-JamesYE03/commit/e75a74d)
-· [`99af7e4`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit4-JamesYE03/commit/99af7e4)
-
-<!-- TODO (James): job 3 for this moment — "how I knew it was right" — is the one
-     thing no test here can carry, because it is my ears. Add a sentence in your
-     own words after you have listened: what the additive version gave you that
-     you would not have got from K-S. That sentence is the evidence. -->
+[`99af7e4...8dc2ef7`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit4-JamesYE03/compare/99af7e4...8dc2ef7)
 
 ## Where the checks stop
 
-`pnpm check` (typecheck, build, 37 tests) holds the contracts. It cannot tell me
-whether the bell sounds like a bell, whether the beam feels weighty, or whether a
-stranger finds music in it uninstructed — and those are exactly what the pod
-judges on a cold open. Those spec lines are named in `CLAUDE.md` so I know they
-are mine, not the suite's.
+41 tests hold the contracts. None can hear whether it sounds like bronze, or
+whether a stranger finds music in it uninstructed — what the pod judges on a cold
+open. Those lines are named in `CLAUDE.md`.
