@@ -1,17 +1,14 @@
+/* The palette follows the reference ink painting: cool, high-key, nearly
+   colourless. The bell is the one warm dark mass in it, which is what makes it
+   read as the subject the way the pavilions do in the painting. */
 :root {
-  --paper-high: #f8f5ec;
-  --paper: #f1ece0;
-  --paper-deep: #e2dacb;
-  --ink: #2b2f31;
-  --ink-soft: #737a7d;
-  --bronze-deep: #3b433d;
-  --bronze-dark: #4b544c;
-  --bronze: #707c6d;
-  --bronze-high: #9aa392;
-  --wood-high: #a37f5d;
-  --wood: #87684b;
-  --wood-dark: #5b4432;
-  --glow: #e0c27a;
+  --paper-high: #fcfcfa;
+  --paper: #f4f4f1;
+  --paper-deep: #e7e7e2;
+  --ink: #23282a;
+  --ink-soft: #7c8285;
+  --seal: #8d3b2f;
+  --glow: #e6cd93;
 }
 
 * {
@@ -49,65 +46,57 @@ body {
   border: 0;
 }
 
-/* ---------- masthead ---------- */
+/* ---------- masthead ----------
+   Traditional composition puts the seal and the inscription in a margin, not
+   across the middle of the view, so both sit top-left and leave the画面 open. */
 
 .masthead {
   position: fixed;
-  inset: 0 0 auto 0;
+  inset: 0 auto auto 0;
   z-index: 2;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.15rem;
-  padding: 1.15rem 1rem 0;
+  align-items: baseline;
+  gap: 1.1rem;
+  padding: 1.6rem 0 0 2.2rem;
   pointer-events: none;
 }
 
 .seal {
   margin: 0;
-  font-size: 1.9rem;
-  font-weight: 500;
+  font-size: 1.55rem;
+  font-weight: 400;
   line-height: 1;
   letter-spacing: 0.1em;
-  color: #8d3b2f;
+  color: var(--seal);
 }
 
 .seal__char {
   display: inline-block;
-  padding: 0.14em 0.2em 0.2em;
-  border: 1.5px solid currentcolor;
-  border-radius: 2px;
-  opacity: 0.82;
+  padding: 0.16em 0.2em 0.22em;
+  border: 1.4px solid currentcolor;
+  border-radius: 1px;
+  opacity: 0.8;
 }
 
 .hint {
-  margin: 0.55rem 0 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.15rem;
-  font-size: 0.8rem;
-  letter-spacing: 0.09em;
-  color: var(--ink-soft);
-  text-align: center;
-}
-
-.hint__en {
+  margin: 0;
+  padding-bottom: 0.15rem;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-style: italic;
-  letter-spacing: 0.03em;
-  opacity: 0.72;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+  opacity: 0.82;
 }
 
 .masthead__nav {
   position: fixed;
-  bottom: 0.7rem;
-  left: 0.9rem;
+  bottom: 0.9rem;
+  left: 2.3rem;
   pointer-events: auto;
-  font-size: 0.62rem;
-  letter-spacing: 0.14em;
-  opacity: 0.3;
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  opacity: 0.28;
 }
 
 .masthead__nav a {
@@ -136,31 +125,51 @@ main {
   cursor: default;
 }
 
+.scene__distance {
+  /* Multiply keeps the painting's whites as paper instead of laying a grey
+     rectangle over it, so its edges disappear into the page. */
+  mix-blend-mode: multiply;
+  opacity: 0.92;
+  pointer-events: none;
+}
+
 .scene__grain {
-  opacity: 0.045;
+  opacity: 0.05;
   mix-blend-mode: multiply;
   pointer-events: none;
 }
 
-.scene__hills path {
+.scene__wash path {
   fill: var(--ink);
-  opacity: 0.075;
+  opacity: 0.085;
+}
+
+.scene__wash--pale {
+  opacity: 0.05 !important;
 }
 
 .scene__mist {
   fill: none;
   stroke: var(--ink);
-  stroke-width: 1.2;
-  opacity: 0.13;
+  stroke-width: 1.1;
+  opacity: 0.11;
 }
+
+/* ---------- the frame ---------- */
 
 .frame rect {
-  fill: var(--wood-dark);
-  opacity: 0.9;
+  fill: #3b2f22;
+  opacity: 0.92;
 }
 
-.frame__post {
-  opacity: 0.55;
+.frame__lit {
+  fill: #6d5539 !important;
+  opacity: 0.85 !important;
+}
+
+.frame__end {
+  fill: #2b2118;
+  opacity: 0.9;
 }
 
 /* ---------- the bell ---------- */
@@ -172,7 +181,7 @@ main {
 }
 
 .halo[data-lit="hover"] {
-  opacity: 0.5;
+  opacity: 0.55;
 }
 
 .bell {
@@ -181,51 +190,117 @@ main {
 
 .bell__body {
   fill: url(#bronze);
-  stroke: var(--bronze-deep);
-  stroke-width: 1.1;
+  stroke: #22261f;
+  stroke-width: 1;
 }
 
 .bell__knob {
-  fill: var(--bronze-dark);
+  fill: #454c42;
+  stroke: #22261f;
+  stroke-width: 0.8;
 }
 
-.bell__knob-loop {
+.bell__knob-arch {
   fill: none;
-  stroke: var(--bronze-dark);
-  stroke-width: 4;
+  stroke: #5b6355;
+  stroke-width: 4.5;
   stroke-linecap: round;
 }
 
-.bell__band,
-.bell__lip {
+.bell__patina {
+  opacity: 0.11;
+  mix-blend-mode: overlay;
+}
+
+.bell__sheen {
+  opacity: 0.72;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.bell__hotspot {
+  opacity: 0.8;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.bell__mouth-shade {
+  pointer-events: none;
+}
+
+/* Goes bright for the length of the contact and nothing else. A dedicated
+   overlay rather than a filter, so scaling the bell never re-rasterises. */
+.bell__flash {
+  opacity: 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  transition: opacity 260ms ease-out;
+}
+
+/* the lit contour — the single line that stops it looking flat */
+.bell__rim {
   fill: none;
-  stroke: var(--bronze-deep);
+  stroke: #c3c9b4;
+  stroke-width: 1.6;
   stroke-linecap: round;
   opacity: 0.5;
 }
 
 .bell__band {
-  stroke-width: 1.6;
+  fill: none;
+  stroke: #1f231c;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  opacity: 0.45;
+}
+
+.bell__band-lit {
+  fill: none;
+  stroke: #aab19a;
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  opacity: 0.35;
 }
 
 .bell__lip {
-  stroke-width: 4;
-  opacity: 0.72;
+  fill: none;
+  stroke: #1c201a;
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  opacity: 0.8;
 }
 
 .bell__studs circle {
-  fill: var(--bronze-deep);
+  fill: #23271f;
+  opacity: 0.5;
+}
+
+.bell__studs-lit circle {
+  fill: #cdd3bd;
   opacity: 0.4;
 }
 
-.bell__art {
-  transform-box: fill-box;
-  transform-origin: center;
+.bell__inscription path {
+  fill: none;
+  stroke: #1e221b;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  opacity: 0.22;
 }
 
-/* the flash at the moment of contact */
-.bell[data-ringing="true"] .bell__body {
-  fill: var(--bronze-high);
+/* the flash at the moment of contact: the whole lit face flares */
+.bell[data-ringing="true"] .bell__flash {
+  opacity: 0.55;
+  transition-duration: 40ms;
+}
+
+.bell[data-ringing="true"] .bell__sheen {
+  opacity: 1;
+}
+
+.bell[data-ringing="true"] .bell__rim {
+  stroke: #f2eedc;
+  opacity: 0.95;
 }
 
 /* ---------- ripples ---------- */
@@ -240,13 +315,19 @@ main {
 /* ---------- the beam ---------- */
 
 .rope {
-  stroke: var(--wood-dark);
-  stroke-width: 2;
-  opacity: 0.6;
+  stroke: #4a3a28;
+  stroke-width: 2.1;
+  stroke-linecap: round;
+  opacity: 0.72;
 }
 
-.pivot {
-  fill: var(--wood-dark);
+.pivot rect {
+  fill: #2f2418;
+}
+
+.pivot__eye {
+  fill: #8a7150;
+  opacity: 0.9;
 }
 
 .beam {
@@ -263,44 +344,64 @@ main {
 
 .beam__log {
   fill: url(#wood);
-  stroke: var(--wood-dark);
-  stroke-width: 1;
+  stroke: #33261a;
+  stroke-width: 0.9;
 }
 
-.beam__head {
-  fill: var(--wood-high);
-  stroke: var(--wood-dark);
-  stroke-width: 1.2;
+/* the soft length of light along the top of a turned log */
+.beam__sheen {
+  fill: #d8b689;
+  opacity: 0.3;
+  mix-blend-mode: screen;
+}
+
+.beam__hoops rect {
+  fill: #4f4436;
+  opacity: 0.75;
 }
 
 .beam__grain {
   fill: none;
-  stroke: var(--wood-dark);
+  stroke: #2f2419;
   stroke-width: 1;
-  opacity: 0.3;
-  stroke-dasharray: 22 13 34 9;
+  opacity: 0.28;
+  stroke-dasharray: 24 14 36 10;
 }
 
-/* A held beam glows faintly warmer the higher it is raised, so you can feel
-   how hard the next strike will land before you let go. */
-.rig__swing {
-  filter: drop-shadow(0 0 0 transparent);
+.beam__head {
+  stroke: #2f2318;
+  stroke-width: 1.1;
+}
+
+.beam__head-lit {
+  fill: #e4c79c;
+  opacity: 0.42;
+  mix-blend-mode: screen;
 }
 
 /* ---------- phones ---------- */
 
-@media (max-width: 640px) {
+@media (max-width: 700px) {
+  .masthead {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1.1rem 0 0 1.2rem;
+  }
+
   .seal {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
   }
 
   .hint {
-    font-size: 0.72rem;
-    max-width: 22rem;
+    font-size: 0.68rem;
+    max-width: 15rem;
+    line-height: 1.5;
   }
 
-  .hint__en {
-    font-size: 0.64rem;
+  .masthead__nav {
+    left: 1.3rem;
+    bottom: 0.7rem;
   }
 }
 

@@ -155,6 +155,27 @@ assuming a fix documented in one place means every surface agrees.
   fundamental --- that inharmonicity is the whole difference between "bell" and
   "plucked string". See `src/bell.ts` for the ratios and why each is there.
 
+### The scene's geometry is a contract, not a drawing
+
+The bell is on the **right**, the beam on its **left**. That is not a taste
+call: the beam is pulled left, away from the bell, so gravity returns it
+travelling *rightwards* at the bottom of its arc. Mirror the layout and the head
+arrives at rest moving *away* from the bell — which still looks correct in a
+screenshot, because at rest the head is touching. It just could never strike.
+
+The numbers therefore live in `src/scene.ts`, not scattered through `index.html`
+and `main.ts`, and `spec/instrument.test.ts` asserts the relationship: head and
+wall meet at rest at every size, the bell lies on the side the head travels
+towards, and raising the beam *opens* the gap. Change the layout and those go
+red rather than shipping.
+
+**When you write a check like that, mutation-test it before trusting it.** The
+first version of this one derived the contact point *from* the bell's own origin,
+so the assertion was true by construction and stayed green with the bell moved
+back to the wrong side. A tautological test is worse than no test: it reports
+confidence it hasn't earned. Break the thing on purpose, watch the check go red,
+put it back.
+
 ### Pointer and touch
 
 - **`touch-action: none`** on the interactive stage, or the browser hijacks the

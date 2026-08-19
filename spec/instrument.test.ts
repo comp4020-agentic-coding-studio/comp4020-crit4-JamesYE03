@@ -19,6 +19,7 @@ import {
   release,
   stepBeam,
 } from "../src/pendulum";
+import { bellSideOfHead, contactDirectionX, headGapToBell, strikePoint } from "../src/scene";
 
 // C4 "An instrument" — https://comp.anu.edu.au/courses/comp4020-agentic-coding-studio/crits/04-instrument/
 //
@@ -218,6 +219,52 @@ describe("spec: the beam swings, falls, and strikes once", () => {
     };
     expect(landed(1.2)).toBeGreaterThan(landed(0.4));
     expect(landed(0.4)).toBeGreaterThan(0);
+  });
+});
+
+describe("spec: the head is travelling into the bell when it lands", () => {
+  // The bug this guards: with the bell on the same side the beam is pulled
+  // towards, the head arrives at rest moving *away* from the bell. Frozen in a
+  // screenshot it looks correct — the head is touching — but nothing could ever
+  // be struck. Layout and swing direction have to agree, and now they have to
+  // agree in a check rather than in my head.
+
+  it("head and bell wall meet at rest, at every size", () => {
+    // Both sides computed independently: the head's face from the beam's own
+    // pivot and reach, the wall from the bell's origin and profile. If either
+    // moves without the other, this is the check that says so.
+    for (const size of [MIN_SIZE, 0.85, 1, 1.4, MAX_SIZE]) {
+      expect(headGapToBell(size, REST_ANGLE), `they part company at size ${size}`).toBeCloseTo(
+        0,
+        6,
+      );
+    }
+  });
+
+  it("the bell lies on the side the head is travelling towards at contact", () => {
+    expect(contactDirectionX()).toBe(1);
+    for (const size of [MIN_SIZE, 1, MAX_SIZE]) {
+      expect(
+        bellSideOfHead(size),
+        `at size ${size} the head would be moving away from the bell as it lands`,
+      ).toBe(contactDirectionX());
+    }
+  });
+
+  it("raising the beam opens a gap between the head and the bell", () => {
+    const gaps = [0, 0.3, 0.7, 1.0, MAX_ANGLE].map((angle) => headGapToBell(1, angle));
+    for (let i = 1; i < gaps.length; i += 1) {
+      expect(gaps[i], "pulling the beam up must take it away from the bell").toBeGreaterThan(
+        gaps[i - 1],
+      );
+    }
+  });
+
+  it("the contact point tracks the bell as it grows", () => {
+    // A bigger bell reaches further left and hangs lower, so the beam has to
+    // follow it on both axes or it stops touching.
+    expect(strikePoint(MAX_SIZE).x).toBeLessThan(strikePoint(MIN_SIZE).x);
+    expect(strikePoint(MAX_SIZE).y).toBeGreaterThan(strikePoint(MIN_SIZE).y);
   });
 });
 

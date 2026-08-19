@@ -6,7 +6,7 @@
     <title>鐘 Temple Bell — 撞钟</title>
     <meta
       name="description"
-      content="Drag the hanging beam and let gravity swing it into a bronze temple bell. Scroll or pinch to resize the bell: a bigger bell rings lower and darker. Every sound is synthesised live in the browser."
+      content="Drag the hanging beam away from a bronze temple bell and let gravity swing it back to strike. Scroll or pinch to resize the bell: a bigger bell rings lower and darker. Every sound is synthesised live in the browser."
     />
 
     <meta property="og:type" content="website" />
@@ -21,10 +21,7 @@
         <span class="seal__char" aria-hidden="true">鐘</span>
         <span class="sr-only">鐘 — a bronze temple bell you strike in the browser</span>
       </h1>
-      <p class="hint">
-        <span>拖动撞木，松手撞钟 · 滚轮或双指缩放大钟</span>
-        <span class="hint__en" lang="en">drag the beam and let go · scroll or pinch to resize the bell</span>
-      </p>
+      <p class="hint" lang="en">drag the beam away and let go · scroll or pinch to resize the bell</p>
       <nav aria-label="Primary" class="masthead__nav">
         <a href="./">鐘 Temple Bell</a>
       </nav>
@@ -34,121 +31,255 @@
       <svg
         class="scene"
         data-scene
-        viewBox="0 0 900 640"
+        viewBox="0 0 1000 660"
         preserveAspectRatio="xMidYMid meet"
         role="application"
-        aria-label="A bronze temple bell with a wooden beam hanging beside it. Drag the beam away from the bell and release it to strike."
+        aria-label="A bronze temple bell hanging over a misty mountain landscape, with a wooden beam suspended to its left. Drag the beam away from the bell and release it to strike."
       >
         <defs>
-          <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id="paper" x1="0.1" y1="0" x2="0.7" y2="1">
             <stop offset="0%" stop-color="var(--paper-high)" />
-            <stop offset="62%" stop-color="var(--paper)" />
+            <stop offset="58%" stop-color="var(--paper)" />
             <stop offset="100%" stop-color="var(--paper-deep)" />
           </linearGradient>
 
-          <linearGradient id="bronze" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stop-color="var(--bronze-dark)" />
-            <stop offset="18%" stop-color="var(--bronze)" />
-            <stop offset="42%" stop-color="var(--bronze-high)" />
-            <stop offset="66%" stop-color="var(--bronze)" />
-            <stop offset="100%" stop-color="var(--bronze-deep)" />
+          <!-- The distant view fades away to the lower right, so its softness
+               reads as mist and depth rather than as a small image stretched. -->
+          <linearGradient id="recede" x1="0.05" y1="0" x2="0.95" y2="0.72">
+            <stop offset="0%" stop-color="#fff" stop-opacity="0.96" />
+            <stop offset="38%" stop-color="#fff" stop-opacity="0.9" />
+            <stop offset="68%" stop-color="#fff" stop-opacity="0.44" />
+            <stop offset="88%" stop-color="#fff" stop-opacity="0.1" />
+            <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+          </linearGradient>
+          <mask id="mist-mask">
+            <rect x="-30" y="0" width="880" height="527" fill="url(#recede)" />
+          </mask>
+
+          <!-- Bronze, lit from the upper left: dark rim, sheen, body, and the
+               shadow side turning away. -->
+          <linearGradient id="bronze" x1="0" y1="0.08" x2="1" y2="0.22">
+            <stop offset="0%" stop-color="#2f342f" />
+            <stop offset="9%" stop-color="#4c534a" />
+            <stop offset="26%" stop-color="#79806f" />
+            <stop offset="38%" stop-color="#8e9481" />
+            <stop offset="52%" stop-color="#6e7565" />
+            <stop offset="74%" stop-color="#4a5145" />
+            <stop offset="92%" stop-color="#333831" />
+            <stop offset="100%" stop-color="#272b26" />
+          </linearGradient>
+
+          <!-- the specular band down the lit face -->
+          <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#fff" stop-opacity="0" />
+            <stop offset="42%" stop-color="#fff" stop-opacity="0.5" />
+            <stop offset="58%" stop-color="#fff" stop-opacity="0.5" />
+            <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+          </linearGradient>
+
+          <!-- the wet gloss point on the shoulder -->
+          <radialGradient id="hotspot" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%" stop-color="#fff" stop-opacity="0.62" />
+            <stop offset="55%" stop-color="#fff" stop-opacity="0.18" />
+            <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+          </radialGradient>
+
+          <!-- inside the mouth, where no light reaches -->
+          <linearGradient id="mouth-shade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#14170f" stop-opacity="0" />
+            <stop offset="100%" stop-color="#14170f" stop-opacity="0.55" />
           </linearGradient>
 
           <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="var(--wood-high)" />
-            <stop offset="55%" stop-color="var(--wood)" />
-            <stop offset="100%" stop-color="var(--wood-dark)" />
+            <stop offset="0%" stop-color="#4a3826" />
+            <stop offset="16%" stop-color="#8d6d4c" />
+            <stop offset="34%" stop-color="#a8825d" />
+            <stop offset="58%" stop-color="#7d6046" />
+            <stop offset="100%" stop-color="#3f2f21" />
           </linearGradient>
 
+          <radialGradient id="wood-head" cx="0.34" cy="0.3" r="0.72">
+            <stop offset="0%" stop-color="#bb9268" />
+            <stop offset="46%" stop-color="#8a6a4c" />
+            <stop offset="100%" stop-color="#402f20" />
+          </radialGradient>
+
           <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
-            <stop offset="0%" stop-color="var(--glow)" stop-opacity="0.5" />
-            <stop offset="70%" stop-color="var(--glow)" stop-opacity="0.12" />
+            <stop offset="0%" stop-color="var(--glow)" stop-opacity="0.42" />
+            <stop offset="58%" stop-color="var(--glow)" stop-opacity="0.13" />
             <stop offset="100%" stop-color="var(--glow)" stop-opacity="0" />
           </radialGradient>
 
-          <filter id="ink-bleed" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="7" />
+          <filter id="ink-bleed" x="-25%" y="-25%" width="150%" height="150%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="11" result="n" />
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G" />
+            <feGaussianBlur stdDeviation="3.5" />
+          </filter>
+
+          <filter id="patina" x="-6%" y="-6%" width="112%" height="112%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="4" seed="5" />
+            <feColorMatrix type="saturate" values="0" />
           </filter>
 
           <filter id="grain" x="0" y="0" width="100%" height="100%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="7" />
+            <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="7" />
             <feColorMatrix type="saturate" values="0" />
           </filter>
+
+          <clipPath id="bell-clip">
+            <path
+              d="M 0 22 C -20 22 -34 28 -40 44 C -50 74 -60 122 -66 172 C -70 198 -73 214 -75 224 C -76 230 -72 235 -66 236 L 66 236 C 72 235 76 230 75 224 C 73 214 70 198 66 172 C 60 122 50 74 40 44 C 34 28 20 22 0 22 Z"
+            />
+          </clipPath>
         </defs>
 
-        <!-- paper -->
-        <rect width="900" height="640" fill="url(#paper)" />
-        <rect width="900" height="640" filter="url(#grain)" class="scene__grain" />
+        <!-- 紙 -->
+        <rect width="1000" height="660" fill="url(#paper)" />
 
-        <!-- 远山: one soft ink silhouette, and nothing else -->
-        <g class="scene__hills" filter="url(#ink-bleed)" aria-hidden="true">
-          <path d="M -40 470 C 130 396 210 452 330 424 C 470 392 560 448 700 410 C 810 380 890 418 940 400 L 940 640 L -40 640 Z" />
-        </g>
-        <path
-          class="scene__mist"
-          d="M -40 486 C 180 460 330 500 520 478 C 700 458 830 492 940 470"
+        <!-- 遠景: the reference ink painting, receding to the lower right -->
+        <image
+          href="./ink-mountains.png"
+          x="-30"
+          y="0"
+          width="880"
+          height="527"
+          mask="url(#mist-mask)"
+          class="scene__distance"
+          preserveAspectRatio="xMidYMid slice"
           aria-hidden="true"
         />
 
-        <!-- 梁: the frame both the bell and the beam hang from -->
+        <!-- a near wash of ink, to seat the foreground -->
+        <g class="scene__wash" filter="url(#ink-bleed)" aria-hidden="true">
+          <path d="M -60 566 C 140 528 268 560 430 542 C 610 522 760 556 1060 528 L 1060 720 L -60 720 Z" />
+          <path class="scene__wash--pale" d="M -60 606 C 180 578 380 604 560 588 C 760 570 900 598 1060 580 L 1060 720 L -60 720 Z" />
+        </g>
+        <path class="scene__mist" d="M -40 512 C 200 492 372 524 556 504 C 742 484 878 512 1040 496" aria-hidden="true" />
+
+        <rect width="1000" height="660" filter="url(#grain)" class="scene__grain" aria-hidden="true" />
+
+        <!-- 梁: enters from the top edge and runs off the right. No posts —
+             the frame is a suggestion, not a diagram. -->
         <g class="frame" aria-hidden="true">
-          <rect x="96" y="66" width="672" height="20" rx="5" />
-          <rect x="118" y="86" width="16" height="554" class="frame__post" />
-          <rect x="730" y="86" width="16" height="554" class="frame__post" />
+          <rect x="352" y="68" width="708" height="24" rx="3" />
+          <rect x="352" y="68" width="708" height="5" rx="2" class="frame__lit" />
+          <path class="frame__end" d="M 352 68 L 336 78 L 352 92 Z" />
         </g>
 
         <!-- glow behind the bell, brightened on hover and on strike -->
-        <circle data-halo class="halo" cx="300" cy="215" r="215" fill="url(#halo)" />
+        <circle data-halo class="halo" cx="640" cy="210" r="230" fill="url(#halo)" />
 
-        <!-- 鐘 -->
-        <g data-bell class="bell" aria-label="The bell. Scroll or pinch to resize it: a bigger bell rings lower.">
-          <g class="bell__art">
-            <!-- 龍鈕 -->
-            <path class="bell__knob" d="M -13 -6 C -15 -26 -6 -34 0 -34 C 6 -34 15 -26 13 -6 Z" />
-            <path class="bell__knob-loop" d="M -7 -26 C -7 -36 7 -36 7 -26" />
-            <!-- 鐘身 -->
-            <path
-              class="bell__body"
-              d="M 0 -6 C -24 -6 -42 6 -48 28 C -60 66 -70 122 -74 174 C -76 186 -74 194 -66 197 L 66 197 C 74 194 76 186 74 174 C 70 122 60 66 48 28 C 42 6 24 -6 0 -6 Z"
-            />
-            <!-- 帶: the cast bands -->
-            <path class="bell__band" d="M -52 46 C -20 52 20 52 52 46" />
-            <path class="bell__band" d="M -63 104 C -24 111 24 111 63 104" />
-            <path class="bell__band" d="M -71 158 C -27 165 27 165 71 158" />
-            <!-- 鐘口 -->
-            <path class="bell__lip" d="M -66 194 C -24 200 24 200 66 194" />
-            <!-- 乳釘 -->
-            <g class="bell__studs">
-              <circle cx="-34" cy="76" r="3" />
-              <circle cx="0" cy="79" r="3" />
-              <circle cx="34" cy="76" r="3" />
-            </g>
-          </g>
-        </g>
-
-        <!-- ripples land here, in scene coordinates -->
-        <g data-ripples class="ripples" aria-hidden="true"></g>
-
-        <!-- 撞木 -->
+        <!-- 撞木 — to the LEFT of the bell. Pulling it left lifts it away from
+             the bell, so when gravity brings it back down it is travelling
+             rightwards, into the bell, at the moment of contact. -->
         <g data-rig class="rig">
           <g data-swing class="rig__swing">
-            <line data-rope class="rope" x1="446" y1="90" x2="378" y2="248" />
-            <line data-rope class="rope" x1="446" y1="90" x2="514" y2="248" />
+            <line data-rope class="rope" x1="479" y1="92" x2="411" y2="257" />
+            <line data-rope class="rope" x1="479" y1="92" x2="547" y2="257" />
             <g
               data-beam
               class="beam"
               tabindex="-1"
-              aria-label="The beam. Drag it away from the bell and let go to strike."
+              aria-label="The beam. Drag it left, away from the bell, and let go to strike."
             >
               <!-- generous, invisible grab area -->
-              <rect class="beam__grab" x="356" y="222" width="180" height="76" />
-              <rect class="beam__log" x="371" y="247" width="150" height="26" rx="13" />
-              <circle class="beam__head" cx="374" cy="260" r="17" />
-              <path class="beam__grain" d="M 392 260 H 512" />
+              <rect class="beam__grab" x="389" y="230" width="188" height="80" />
+              <rect class="beam__log" x="404" y="257" width="150" height="26" rx="13" />
+              <rect class="beam__sheen" x="414" y="262" width="128" height="6" rx="3" />
+              <g class="beam__hoops">
+                <rect x="435" y="255" width="5" height="30" rx="2" />
+                <rect x="505" y="255" width="5" height="30" rx="2" />
+              </g>
+              <path class="beam__grain" d="M 423 276 H 541" />
+              <circle class="beam__head" cx="554" cy="270" r="18" fill="url(#wood-head)" />
+              <circle class="beam__head-lit" cx="549" cy="264" r="6" />
             </g>
           </g>
-          <circle data-pivot class="pivot" cx="446" cy="90" r="7" aria-hidden="true" />
+          <g class="pivot" data-pivot aria-hidden="true">
+            <rect x="471" y="84" width="16" height="14" rx="3" />
+            <circle cx="479" cy="92" r="4.5" class="pivot__eye" />
+          </g>
         </g>
+
+        <!-- 鐘 -->
+        <g data-bell class="bell" aria-label="The bell. Scroll or pinch to resize it: a bigger bell rings lower.">
+          <!-- 龍鈕 -->
+          <path class="bell__knob" d="M -10 24 C -14 12 -10 3 0 3 C 10 3 14 12 10 24 Z" />
+          <path class="bell__knob-arch" d="M -15 13 C -16 -3 -5 -7 0 4 C 5 -7 16 -3 15 13" />
+
+          <!-- 鐘身 -->
+          <path
+            class="bell__body"
+            d="M 0 22 C -20 22 -34 28 -40 44 C -50 74 -60 122 -66 172 C -70 198 -73 214 -75 224 C -76 230 -72 235 -66 236 L 66 236 C 72 235 76 230 75 224 C 73 214 70 198 66 172 C 60 122 50 74 40 44 C 34 28 20 22 0 22 Z"
+          />
+
+          <g clip-path="url(#bell-clip)">
+            <!-- 銅銹: mottling, so the surface is not a flat gradient -->
+            <rect x="-80" y="18" width="160" height="222" filter="url(#patina)" class="bell__patina" />
+            <!-- the specular band down the lit face -->
+            <rect class="bell__sheen" x="-56" y="20" width="34" height="220" fill="url(#sheen)" />
+            <!-- the gloss point on the shoulder -->
+            <ellipse class="bell__hotspot" cx="-27" cy="52" rx="26" ry="18" fill="url(#hotspot)" />
+            <!-- inside the mouth -->
+            <rect class="bell__mouth-shade" x="-80" y="190" width="160" height="50" fill="url(#mouth-shade)" />
+            <!-- the contact flash -->
+            <rect class="bell__flash" x="-80" y="18" width="160" height="222" fill="#f6f3e4" />
+          </g>
+
+          <!-- rim light along the contour that faces the light -->
+          <path
+            class="bell__rim"
+            d="M 0 22 C -20 22 -34 28 -40 44 C -50 74 -60 122 -66 172 C -70 198 -73 214 -75 224"
+          />
+
+          <!-- 帶: three cast bands, each in relief -->
+          <g class="bell__bands">
+            <path class="bell__band" d="M -49 62 C -18 68 18 68 49 62" />
+            <path class="bell__band-lit" d="M -49 59 C -18 65 18 65 49 59" />
+            <path class="bell__band" d="M -60 126 C -22 133 22 133 60 126" />
+            <path class="bell__band-lit" d="M -60 123 C -22 130 22 130 60 123" />
+            <path class="bell__band" d="M -70 190 C -25 198 25 198 70 190" />
+            <path class="bell__band-lit" d="M -70 187 C -25 195 25 195 70 187" />
+          </g>
+
+          <!-- 乳釘: the stud panels, in rows as a cast bell has them -->
+          <g class="bell__studs">
+            <circle cx="-33" cy="82" r="3.1" />
+            <circle cx="-11" cy="85" r="3.1" />
+            <circle cx="11" cy="85" r="3.1" />
+            <circle cx="33" cy="82" r="3.1" />
+            <circle cx="-37" cy="100" r="3.1" />
+            <circle cx="-12" cy="103" r="3.1" />
+            <circle cx="12" cy="103" r="3.1" />
+            <circle cx="37" cy="100" r="3.1" />
+          </g>
+          <g class="bell__studs-lit">
+            <circle cx="-34" cy="81" r="1.1" />
+            <circle cx="-12" cy="84" r="1.1" />
+            <circle cx="10" cy="84" r="1.1" />
+            <circle cx="32" cy="81" r="1.1" />
+            <circle cx="-38" cy="99" r="1.1" />
+            <circle cx="-13" cy="102" r="1.1" />
+            <circle cx="11" cy="102" r="1.1" />
+            <circle cx="36" cy="99" r="1.1" />
+          </g>
+
+          <!-- 銘文 panel, suggested rather than written -->
+          <g class="bell__inscription">
+            <path d="M -8 148 H 8" />
+            <path d="M -10 158 H 10" />
+            <path d="M -7 168 H 7" />
+          </g>
+
+          <!-- 鐘口: the scalloped lip -->
+          <path
+            class="bell__lip"
+            d="M -67 231 C -55 238 -44 229 -33 235 C -22 241 -11 232 0 238 C 11 241 22 232 33 235 C 44 238 55 229 67 231"
+          />
+        </g>
+
+        <!-- ripples land here, in scene coordinates, over everything -->
+        <g data-ripples class="ripples" aria-hidden="true"></g>
       </svg>
     </main>
 

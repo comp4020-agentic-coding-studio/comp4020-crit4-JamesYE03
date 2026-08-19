@@ -13,14 +13,15 @@ import {
   stepBeam,
 } from "./src/pendulum";
 
-// Geometry, matching the SVG in index.html. The bell scales about its
-// suspension point, so the beam has to follow the bell's edge outwards and
-// its strike height downwards as the bell grows.
-const BELL_ORIGIN = { x: 300, y: 110 };
-const BELL_EDGE_AT_STRIKE = 71; // local x of the bell's wall, at strike height
-const STRIKE_LOCAL_Y = 150;
-const PIVOT = { x: 446, y: 90 };
-const ROPE_TOP_TO_LOG = 158; // rope length at size 1
+import {
+  BELL_ORIGIN,
+  PIVOT,
+  ROPE_TOP_TO_LOG,
+  beamDrop,
+  beamShift,
+  pivotX,
+  strikePoint,
+} from "./src/scene";
 
 interface Parts {
   scene: SVGSVGElement;
@@ -31,7 +32,7 @@ interface Parts {
   ropes: SVGLineElement[];
   haloEl: SVGCircleElement;
   ripplesEl: SVGGElement;
-  pivotEl: SVGCircleElement;
+  pivotEl: SVGGElement;
 }
 
 function start({
@@ -55,14 +56,9 @@ function start({
 
   // ---------- geometry ----------
 
-  const strikePoint = () => ({
-    x: BELL_ORIGIN.x + BELL_EDGE_AT_STRIKE * size,
-    y: BELL_ORIGIN.y + STRIKE_LOCAL_Y * size,
-  });
-
   function layout(): void {
-    const drop = STRIKE_LOCAL_Y * (size - 1);
-    const shift = BELL_EDGE_AT_STRIKE * (size - 1);
+    const drop = beamDrop(size);
+    const shift = beamShift(size);
 
     bellEl.setAttribute("transform", `translate(${BELL_ORIGIN.x} ${BELL_ORIGIN.y}) scale(${size})`);
     rigEl.setAttribute("transform", `translate(${shift} 0)`);
@@ -70,12 +66,10 @@ function start({
     for (const rope of ropes) {
       rope.setAttribute("y2", String(PIVOT.y + ROPE_TOP_TO_LOG + drop));
     }
-    pivotEl.setAttribute("cy", String(PIVOT.y));
-
-    const centre = BELL_ORIGIN.y + 100 * size;
+    const centre = BELL_ORIGIN.y + 120 * size;
     haloEl.setAttribute("cx", String(BELL_ORIGIN.x));
     haloEl.setAttribute("cy", String(centre));
-    haloEl.setAttribute("r", String(150 * size + 70));
+    haloEl.setAttribute("r", String(150 * size + 75));
   }
 
   function drawSwing(): void {
@@ -99,7 +93,7 @@ function start({
   // ---------- the strike ----------
 
   function ripple(velocity: number): void {
-    const { x, y } = strikePoint();
+    const { x, y } = strikePoint(size);
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const rings = reduceMotion ? 1 : 3;
 
@@ -187,9 +181,8 @@ function start({
     if (!held) return;
     event.preventDefault();
     const point = toScene(event);
-    const pivotX = PIVOT.x + BELL_EDGE_AT_STRIKE * (size - 1);
     // Angle from straight-down, positive to the left — the direction you pull.
-    beam = raise(beam, Math.atan2(-(point.x - pivotX), point.y - PIVOT.y));
+    beam = raise(beam, Math.atan2(-(point.x - pivotX(size)), point.y - PIVOT.y));
     drawSwing();
   });
 
@@ -313,7 +306,7 @@ const parts: Partial<Parts> = {
   ropes: [...document.querySelectorAll<SVGLineElement>("[data-rope]")],
   haloEl: document.querySelector<SVGCircleElement>("[data-halo]") ?? undefined,
   ripplesEl: document.querySelector<SVGGElement>("[data-ripples]") ?? undefined,
-  pivotEl: document.querySelector<SVGCircleElement>("[data-pivot]") ?? undefined,
+  pivotEl: document.querySelector<SVGGElement>("[data-pivot]") ?? undefined,
 };
 
 if (

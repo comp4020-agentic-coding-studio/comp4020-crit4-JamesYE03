@@ -8,7 +8,7 @@
 import { bellFrequency, bellPartials, ringSeconds, strikeGain } from "./bell";
 
 /** Overlapping rings are the point; leaked oscillators are not. */
-const MAX_VOICES = 6;
+const MAX_VOICES = 8;
 
 interface Engine {
   ctx: AudioContext;
@@ -63,24 +63,51 @@ export function ensureAudio(): Engine | null {
   const ctx = new Ctor();
   void ctx.resume();
 
+  // Catches peaks only, so eight overlapping rings can't stack into clipping.
+  // A high threshold and a fast attack keep it out of the way of the tail.
+  const limiter = ctx.createDynamicsCompressor();
+  limiter.threshold.value = -6;
+  limiter.knee.value = 6;
+  limiter.ratio.value = 8;
+  limiter.attack.value = 0.004;
+  limiter.release.value = 0.25;
+  limiter.connect(ctx.destination);
+
+  // A little lift above 2k is the difference between "bronze" and "wool".
+  const air = ctx.createBiquadFilter();
+  air.type = "highshelf";
+  air.frequency.value = 2200;
+  air.gain.value = 3.5;
+  air.connect(limiter);
+
   const master = ctx.createGain();
-  master.gain.value = 0.9;
-  master.connect(ctx.destination);
+  master.gain.value = 0.85;
+  master.connect(air);
 
   const hall = ctx.createConvolver();
-  hall.buffer = hallImpulse(ctx, 4.5, 3.1);
+  hall.buffer = hallImpulse(ctx, 4.8, 2.6);
+
+  // Only the mids and highs go to the hall. Sending the hum and the prime into
+  // a four-second tail is exactly what turns a big room into a muddy one — the
+  // low end stays dry, so it reads as tight and close while the bell's upper
+  // voices bloom behind it.
+  const sendShape = ctx.createBiquadFilter();
+  sendShape.type = "highpass";
+  sendShape.frequency.value = 220;
+  sendShape.Q.value = 0.5;
 
   // Pre-delay: the gap before the first reflection is what makes a room read
   // as big rather than as a small tiled one.
   const preDelay = ctx.createDelay(0.2);
-  preDelay.delayTime.value = 0.045;
+  preDelay.delayTime.value = 0.05;
 
   const wet = ctx.createGain();
-  wet.gain.value = 0.55;
+  wet.gain.value = 0.4;
 
   const send = ctx.createGain();
   send.gain.value = 1;
-  send.connect(preDelay);
+  send.connect(sendShape);
+  sendShape.connect(preDelay);
   preDelay.connect(hall);
   hall.connect(wet);
   wet.connect(master);
@@ -106,13 +133,16 @@ function strikeTransient(
   const source = ctx.createBufferSource();
   source.buffer = buffer;
 
+  // High and fairly narrow: this is the 铛, the metal-on-metal edge of the
+  // contact, and it wants to sit above the bell's own partials rather than
+  // thicken them.
   const band = ctx.createBiquadFilter();
   band.type = "bandpass";
-  band.frequency.value = Math.min(9000, prime * 7);
-  band.Q.value = 0.9;
+  band.frequency.value = Math.min(11000, prime * 13);
+  band.Q.value = 1.4;
 
   const gain = ctx.createGain();
-  gain.gain.value = 0.18 * (0.3 + 0.7 * velocity);
+  gain.gain.value = 0.22 * (0.3 + 0.7 * velocity);
 
   source.connect(band);
   band.connect(gain);
@@ -155,9 +185,20 @@ export function strikeBell(size: number, velocity: number): void {
   voice.connect(master);
   voice.connect(send);
 
+  // Every partial ramps up from silence at the same instant, so their peaks
+  // land in phase and the sum overshoots 1 — which clips, and clipping is
+  // heard as mud rather than as loudness. Normalise against the sum so a
+  // voice peaks at strikeGain() and no further.
+  const total = partials.reduce((sum, partial) => sum + partial.gain, 0) || 1;
+
   for (const partial of partials) {
     const frequency = prime * partial.ratio;
     if (frequency > 16000) continue;
+
+    // The upper modes of a struck bell start first — they need less of the
+    // blow to get moving. Staggering the onsets by a few milliseconds is both
+    // physically right and what decorrelates the attack.
+    const onset = at + 0.0045 / partial.ratio;
 
     for (const cents of partial.detune) {
       const osc = ctx.createOscillator();
@@ -166,17 +207,17 @@ export function strikeBell(size: number, velocity: number): void {
       osc.detune.value = cents;
 
       const envelope = ctx.createGain();
-      const peak = partial.gain / partial.detune.length;
+      const peak = partial.gain / total / partial.detune.length;
       // A bell's onset is fast but not instant; a hard edge here clicks.
-      envelope.gain.setValueAtTime(0, at);
-      envelope.gain.linearRampToValueAtTime(peak, at + 0.006);
+      envelope.gain.setValueAtTime(0, onset);
+      envelope.gain.linearRampToValueAtTime(peak, onset + 0.005);
       // Exponential ramps cannot reach 0 — aim at an epsilon and then stop.
-      envelope.gain.exponentialRampToValueAtTime(1e-4, at + partial.decay);
+      envelope.gain.exponentialRampToValueAtTime(1e-4, onset + partial.decay);
 
       osc.connect(envelope);
       envelope.connect(voice);
-      osc.start(at);
-      osc.stop(at + partial.decay + 0.05);
+      osc.start(onset);
+      osc.stop(onset + partial.decay + 0.05);
       osc.onended = () => envelope.disconnect();
     }
   }
